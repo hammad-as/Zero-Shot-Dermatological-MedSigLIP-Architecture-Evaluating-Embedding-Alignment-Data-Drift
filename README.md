@@ -35,4 +35,4 @@ The execution pipeline is constructed natively in PyTorch utilizing a parallel d
     - "A skin lesion displaying malignant melanoma..." -> 16.54%
     - "A benign intradermal melanocytic nevus..."        -> 10.85%
     - "A normal healthy skin sample..."                  -> 72.61% [MATCH]
-============================================================
+*============================================================
