@@ -5,7 +5,16 @@ This repository implements an end-to-end evaluation pipeline utilizing Google He
 
 By eliminating downstream task-specific fine-tuning bottlenecks, this architecture showcases the utility of multimodal foundation models while aggressively stress-testing the framework against production-level vulnerabilities: **spurious embedding correlations** and **distributional dataset shift**.
 
----
+## Deployment & Local Replication
+
+This architecture supports two deployment methods: an automated, interactive web UI via Gradio, or a lightweight script-based CLI execution.
+
+### Option A: Interactive Web UI Deployment (Recommended)
+This method launches a live browser interface to dynamically test image URLs and custom text queries.
+
+1. **Install Requirements:**
+   ```bash
+   pip install -r requirements.txt
 
 ## System Architecture & Data Pipeline
 The execution pipeline is constructed natively in PyTorch utilizing a parallel dual-tower transformer encoder configuration:
