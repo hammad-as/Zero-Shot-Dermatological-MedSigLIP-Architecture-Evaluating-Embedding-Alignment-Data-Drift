@@ -26,6 +26,5 @@ jobs:
           # Inject the token securely into the Git Authorization header config
           git config --global http.https://huggingface.co/.extraheader "Authorization: Bearer $HF_TOKEN"
           
-          # Force push using the clean, compliant URL layout
-          # CRITICAL: Replace 'your-hf-username' and 'medsiglip-alignment-drift' with your actual parameters
-          git push --force https://huggingface.co/spaces/your-hf-username/medsiglip-alignment-drift main
+          # Force push using your production Hugging Face username parameters
+          git push --force https://huggingface.co/spaces/hammad301/medsiglip-alignment-drift main
