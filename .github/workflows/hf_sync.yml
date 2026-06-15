@@ -19,12 +19,13 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Set up machine profile identity
+          # Configure machine identity
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
           
-          # Inject the token securely into the Git Authorization header config
-          git config --global http.https://huggingface.co/.extraheader "Authorization: Bearer $HF_TOKEN"
+          # Force Git to automatically inject the token for any hf.co space connection
+          # This converts the URL under the hood and bypasses interactive prompt checks entirely
+          git config --global url."https://hammad301:$HF_TOKEN@huggingface.co/spaces/hammad301/".insteadOf "https://huggingface.co/spaces/hammad301/"
           
-          # Force push using your production Hugging Face username parameters
+          # Force push to the target space tracking branch
           git push --force https://huggingface.co/spaces/hammad301/medsiglip-alignment-drift main
