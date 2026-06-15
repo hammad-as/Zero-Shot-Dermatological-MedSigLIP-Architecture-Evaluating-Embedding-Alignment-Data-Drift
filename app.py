@@ -59,67 +59,33 @@ def analyze_clinical_case(image, clinical_query):
 
 
 # -------------------------------------------------------------------------
-# 2. ORIGINAL INTERFACE LAYOUT & COMPONENT MATRIX
+# 2. STANDARD GRADIO INTERFACE CONFIGURATION
 # -------------------------------------------------------------------------
-with gr.Blocks(
-    theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"),
-    analytics_enabled=False
-) as demo:
-    
-    # 🔥 THE EXACT FIX: Short-circuit the internal schema building loop 
-    # This prevents the TypeError while keeping your exact layout running perfectly.
-    demo.get_api_info = lambda *args, **kwargs: {}
-    demo.api_open = False
-    demo.show_api = False
-    
-    gr.Markdown(
-        """
-        # 🔬 MedSigLIP Trust & Safety Governance Framework
-        ### Continuous Embedding Alignment & Population Data Drift Monitoring Dashboard
-        """
-    )
-    
-    with gr.Row():
-        with gr.Column(scale=1):
-            clinical_img = gr.Image(type="numpy", label="Input Dermatological Imagery (JPEG/PNG)")
-            query_txt = gr.Textbox(
-                label="Target Clinical Condition Query String", 
-                placeholder="e.g., 'melanocytic nevus exhibiting cellular atypia'",
-                value="dermatological lesion"
-            )
-            submit_btn = gr.Button("Execute Analysis Pipeline", variant="primary")
-            
-        with gr.Column(scale=1):
-            output_report = gr.TextArea(label="System Analysis Matrix & Logs", interactive=False, lines=8)
-            with gr.Row():
-                alignment_stat = gr.Textbox(label="Vision-Language Alignment Score", interactive=False)
-                drift_stat = gr.Textbox(label="Data Drift Status", interactive=False)
-
-    submit_btn.click(
-        fn=analyze_clinical_case, 
-        inputs=[clinical_img, query_txt], 
-        outputs=[output_report, alignment_stat, drift_stat],
-        queue=False
-    )
+demo = gr.Interface(
+    fn=analyze_clinical_case,
+    inputs=[
+        gr.Image(type="numpy", label="Input Dermatological Imagery (JPEG/PNG)"),
+        gr.Textbox(
+            label="Target Clinical Condition Query String", 
+            placeholder="e.g., 'melanocytic nevus exhibiting cellular atypia'",
+            value="dermatological lesion"
+        )
+    ],
+    outputs=[
+        gr.TextArea(label="System Analysis Matrix & Logs", lines=8),
+        gr.Textbox(label="Vision-Language Alignment Score"),
+        gr.Textbox(label="Data Drift Status")
+    ],
+    title="🔬 MedSigLIP Trust & Safety Governance Framework",
+    description="Continuous Embedding Alignment & Population Data Drift Monitoring Dashboard"
+)
 
 # -------------------------------------------------------------------------
-# 3. RUNTIME SERVER INITIALIZATION
+# 3. STANDARD HOSTING LAUNCH
 # -------------------------------------------------------------------------
 if __name__ == "__main__":
-    # Completely remove the experimental server-side rendering parameters that cause browser hangs
-    if gr.Blocks.launch.__defaults__:
-        gr.Blocks.launch.__defaults__ = tuple(
-            False if isinstance(v, bool) and k == 'ssr' else v 
-            for k, v in zip(gr.Blocks.launch.__code__.co_varnames[1:], gr.Blocks.launch.__defaults__)
-        )
-        
-    if hasattr(demo, "config") and demo.config is not None:
-        demo.config.pop("ssr", None)
-
-    # Restores execution right back onto your original port link
+    # Standard hosting arguments required for Hugging Face Spaces infrastructure
     demo.launch(
-        show_api=False, 
-        server_name="127.0.0.1", 
-        server_port=7860,
-        max_threads=10
+        server_name="0.0.0.0", 
+        server_port=7860
     )
