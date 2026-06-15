@@ -6,3 +6,4 @@ sentencepiece
 numpy
 gradio
 gradio_client
+gradio_client --upgrade
