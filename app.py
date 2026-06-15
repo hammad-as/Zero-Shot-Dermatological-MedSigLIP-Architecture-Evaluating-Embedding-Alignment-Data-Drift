@@ -23,10 +23,9 @@ class ClinicalDriftDetector:
 detector = ClinicalDriftDetector()
 
 def analyze_clinical_case(image, clinical_query):
-    # Quietly return empty/placeholder values if an image isn't loaded yet
     if image is None or not clinical_query.strip():
         return (
-            "⏳ Standing by. Upload an image array above to initialize automated pipeline analysis...",
+            "⏳ Standing by. Upload an image array to initialize automated pipeline analysis...",
             "Waiting...",
             "Awaiting Input"
         )
@@ -60,17 +59,12 @@ def analyze_clinical_case(image, clinical_query):
 
 
 # -------------------------------------------------------------------------
-# 2. AUTO-TRIGGER INTERFACE LAYOUT (Blocks Structure)
+# 2. STABLE HIGH-AVAILABILITY LAYOUT STRUCTURE
 # -------------------------------------------------------------------------
-with gr.Blocks(
-    theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"),
-    analytics_enabled=False
-) as demo:
+with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"), analytics_enabled=False) as demo:
     
-    # Short-circuit internal schema compiling bugs to ensure stable HF space hosting
+    # Simple direct override to prevent schema building errors
     demo.get_api_info = lambda *args, **kwargs: {}
-    demo.api_open = False
-    demo.show_api = False
     
     gr.Markdown(
         """
@@ -79,62 +73,32 @@ with gr.Blocks(
         """
     )
     
-    with gr.Row():
-        with gr.Column(scale=1):
-            gr.Markdown("### 📥 Input Channel")
-            clinical_img = gr.Image(type="numpy", label="Input Dermatological Imagery (JPEG/PNG)")
-            query_txt = gr.Textbox(
+    # Using live=True handles real-time auto-calculation safely on any Gradio version
+    gr.Interface(
+        fn=analyze_clinical_case,
+        inputs=[
+            gr.Image(type="numpy", label="Input Dermatological Imagery (JPEG/PNG)"),
+            gr.Topic = gr.Textbox(
                 label="Target Clinical Condition Query String", 
                 placeholder="Enter condition query string...",
                 value="dermatological lesion"
             )
-            
-        with gr.Column(scale=1):
-            gr.Markdown("### 📊 Automated Live System Telemetry")
-            output_report = gr.TextArea(
-                label="System Analysis Matrix & Logs", 
-                interactive=False, 
-                lines=8,
-                value="⏳ Standing by. Upload an image array above to initialize automated pipeline analysis..."
-            )
-            with gr.Row():
-                alignment_stat = gr.Textbox(label="Vision-Language Alignment Score", interactive=False, value="Awaiting Input")
-                drift_stat = gr.Textbox(label="Data Drift Status", interactive=False, value="Awaiting Input")
-
-    # ⚡ THE AUTO-TRIGGER EVENT LOGIC:
-    # Captures whenever an image is dropped, pasted, uploaded, or cleared
-    clinical_img.change(
-        fn=analyze_clinical_case,
-        inputs=[clinical_img, query_txt],
-        outputs=[output_report, alignment_stat, drift_stat],
-        queue=False
-    )
-    
-    # Also recalculates immediately if someone types a new string query in the box
-    query_txt.submit(
-        fn=analyze_clinical_case,
-        inputs=[clinical_img, query_txt],
-        outputs=[output_report, alignment_stat, drift_stat],
-        queue=False
+        ],
+        outputs=[
+            gr.TextArea(label="System Analysis Matrix & Logs", lines=8),
+            gr.Textbox(label="Vision-Language Alignment Score"),
+            gr.Textbox(label="Data Drift Status")
+        ],
+        live=True, # ⚡ Activates instant auto-detection on image upload or text change
+        allow_flagging="never"
     )
 
 # -------------------------------------------------------------------------
-# 3. SPACES PLATFORM COMPATIBILITY LAYER
+# 3. SPACES PLATFORM COMPATIBILITY LAUNCH
 # -------------------------------------------------------------------------
 if __name__ == "__main__":
-    if gr.Blocks.launch.__defaults__:
-        gr.Blocks.launch.__defaults__ = tuple(
-            False if isinstance(v, bool) and k == 'ssr' else v 
-            for k, v in zip(gr.Blocks.launch.__code__.co_varnames[1:], gr.Blocks.launch.__defaults__)
-        )
-        
-    if hasattr(demo, "config") and demo.config is not None:
-        demo.config.pop("ssr", None)
-
     demo.launch(
-        show_api=False, 
+        show_api=False,
         server_name="0.0.0.0", 
-        server_port=7860,
-        ssr=False,
-        max_threads=10
+        server_port=7860
     )
