@@ -59,5 +59,22 @@ A high zero-shot confidence interval (e.g., 72.61%) is purely a mathematical ind
 2. Engineering Against Distributional Dataset Drift
 As proven by the raw asset payloads (Image 1 at 445x153 vs. Image 2 at 576x656), real-world data arrives unstandardized. While spatial downsampling satisfies pipeline syntax, migrating this model across distinct healthcare facilities introduces severe Data Drift. Variations in camera hardware vendors (e.g., GE vs. Siemens), lens sensor polarization, and institutional exposure baselines fundamentally alter raw pixel distributions. Without active local validation matrices and continuous performance tracking, distributional shift presents an immediate clinical failure risk.
 
+**Deployment & Local Replication**
+
+This architecture supports two deployment methods: an automated, interactive web UI via Gradio, or a permanent cloud hosting strategy via Hugging Face Spaces.
+
+Option A: Interactive Web UI Deployment
+This method launches a live browser interface to dynamically test image URLs and custom text queries.
+
+Install Requirements:
+
+Bash
+pip install -r requirements.txt
+Inject Credentials & Launch:
+Configure your environment token and run the app script:
+
+Bash
+export HF_TOKEN="your_huggingface_token_here"
+python src/app.py
 
 
