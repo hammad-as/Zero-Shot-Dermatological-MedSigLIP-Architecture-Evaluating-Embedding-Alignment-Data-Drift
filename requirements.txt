@@ -1,1 +1,3 @@
-gradio>=5.0.0
+numpy
+# Add any other libraries your model specifically needs (e.g., torch, transformers)
+# DO NOT include "gradio" here
