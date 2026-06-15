@@ -2,67 +2,57 @@ import gradio as gr
 import torch
 import numpy as np
 
-# --- ENGINE ---
+# --- LOGIC ENGINE ---
 class ClinicalDetective:
-    def __init__(self):
-        self.conditions = ["Melanocytic Nevus", "Basal Cell Carcinoma", "Dermatofibroma", "Healthy Tissue"]
-        
     def analyze_image(self, image):
         if image is None:
-            return "Please upload an image first.", "N/A", "Awaiting Data"
+            return "⚠️ No image detected. Please upload an image.", "0%", "N/A"
         
         # Simulated diagnostic logic
-        np.random.seed(int(np.mean(image)) % 1000)
-        diagnosis = np.random.choice(self.conditions)
-        confidence = np.random.uniform(0.85, 0.99)
+        diagnosis = "Melanocytic Nevus"
+        confidence = "92.45%"
         
         report = (
             f"🔬 ANALYSIS REPORT\n"
             f"---------------------------\n"
             f"Status: SUCCESS\n"
             f"Diagnosis: {diagnosis}\n"
-            f"Confidence: {confidence:.2%}\n"
+            f"Confidence: {confidence}\n"
             f"Processing: MedSigLIP Engine v1.0"
         )
-        return report, f"{confidence:.2%}", diagnosis
-
-    def clear_dashboard(self):
-        # Returns empty values for all outputs
-        return None, "", "", ""
+        return report, confidence, diagnosis
 
 detective = ClinicalDetective()
 
-# --- BLOCKS ARCHITECTURE ---
+# --- BLOCKS INTERFACE ---
 with gr.Blocks(theme=gr.themes.Soft()) as demo:
     gr.Markdown("# 🔬 MedSigLIP Diagnostic Dashboard")
     
     with gr.Row():
-        with gr.Column(scale=1):
+        with gr.Column():
             img_in = gr.Image(type="numpy", label="Upload Dermatological Imagery")
             with gr.Row():
                 analyze_btn = gr.Button("Analyze Image", variant="primary")
                 clear_btn = gr.Button("Clear")
-            
-        with gr.Column(scale=1):
-            logs_out = gr.TextArea(label="Diagnostic Logs", interactive=False)
+        
+        with gr.Column():
+            logs_out = gr.TextArea(label="Diagnostic Logs")
             score_out = gr.Textbox(label="Confidence Level")
             cond_out = gr.Textbox(label="Identified Condition")
 
-    # Define Event Handlers
+    # Forcefully re-binding events
     analyze_btn.click(
         fn=detective.analyze_image, 
-        inputs=[img_in], 
+        inputs=img_in, 
         outputs=[logs_out, score_out, cond_out]
     )
     
+    # Simple lambda for clearing to ensure it triggers correctly
     clear_btn.click(
-        fn=detective.clear_dashboard,
-        inputs=[],
+        fn=lambda: (None, "", "", ""),
+        inputs=None,
         outputs=[img_in, logs_out, score_out, cond_out]
     )
-
-# Enable the internal event queue
-demo.queue()
 
 if __name__ == "__main__":
     demo.launch(server_name="0.0.0.0", server_port=7860)
