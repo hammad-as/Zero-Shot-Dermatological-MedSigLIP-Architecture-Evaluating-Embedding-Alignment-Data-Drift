@@ -1,21 +1,19 @@
 import gradio as gr
 
-def test(text):
-    return f"Success: {text}"
+def greet(name):
+    return f"Hello {name}!"
 
-# We explicitly turn off every feature that triggers API schema generation
-demo = gr.Interface(
-    fn=test,
-    inputs="text",
-    outputs="text",
-    analytics_enabled=False
-)
+with gr.Blocks() as demo:
+    name = gr.Textbox(label="Name")
+    output = gr.Textbox(label="Output")
+    btn = gr.Button("Submit")
+    btn.click(fn=greet, inputs=name, outputs=output)
 
 if __name__ == "__main__":
+    # We remove ssr=False. 
+    # show_api=False is the most important fix for your previous error.
     demo.launch(
         show_api=False, 
-        ssr=False, 
-        enable_monitoring=False,
         server_name="0.0.0.0", 
         server_port=7860
     )
