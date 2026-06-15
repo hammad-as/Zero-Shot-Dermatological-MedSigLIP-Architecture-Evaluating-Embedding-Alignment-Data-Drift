@@ -5,3 +5,4 @@ requests
 accelerate
 gradio
 sentencepiece
+numpy
