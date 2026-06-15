@@ -1,19 +1,19 @@
 import gradio as gr
 
-def greet(name):
-    return f"Hello {name}!"
+def process(input_data):
+    # This is your placeholder for your actual model logic
+    return f"Processed: {input_data}"
 
-with gr.Blocks() as demo:
-    name = gr.Textbox(label="Name")
-    output = gr.Textbox(label="Output")
-    btn = gr.Button("Submit")
-    btn.click(fn=greet, inputs=name, outputs=output)
+# Use gr.Interface: it handles the API and UI generation 
+# without needing the complex, error-prone 'Blocks' configuration.
+demo = gr.Interface(
+    fn=process,
+    inputs=gr.Textbox(label="Input"),
+    outputs=gr.Textbox(label="Output"),
+    title="MedSigLIP Dashboard"
+)
 
+# Do NOT pass complex arguments to launch()
+# Keep it as minimal as possible to avoid ASGI/Middleware conflicts.
 if __name__ == "__main__":
-    # We remove ssr=False. 
-    # show_api=False is the most important fix for your previous error.
-    demo.launch(
-        show_api=False, 
-        server_name="0.0.0.0", 
-        server_port=7860
-    )
+    demo.launch(server_name="0.0.0.0", server_port=7860)
