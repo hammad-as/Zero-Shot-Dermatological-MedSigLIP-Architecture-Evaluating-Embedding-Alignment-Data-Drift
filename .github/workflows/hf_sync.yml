@@ -3,7 +3,6 @@ name: Sync Repository to Hugging Face Spaces
 on:
   push:
     branches: [ main ]
-  # Allows you to manually trigger this workflow from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -20,10 +19,13 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Configure git credentials using the secure environment variable
+          # Set up machine profile identity
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
           
-          # Force push the main branch to your Hugging Face Space repository
-          # Swap out 'your-hf-username' and 'medsiglip-alignment-drift' with your actual parameters
-          git push --force https://your-hf-username:$HF_TOKEN@huggingface.co/spaces/your-hf-username/medsiglip-alignment-drift main
+          # Inject the token securely into the Git Authorization header config
+          git config --global http.https://huggingface.co/.extraheader "Authorization: Bearer $HF_TOKEN"
+          
+          # Force push using the clean, compliant URL layout
+          # CRITICAL: Replace 'your-hf-username' and 'medsiglip-alignment-drift' with your actual parameters
+          git push --force https://huggingface.co/spaces/your-hf-username/medsiglip-alignment-drift main
