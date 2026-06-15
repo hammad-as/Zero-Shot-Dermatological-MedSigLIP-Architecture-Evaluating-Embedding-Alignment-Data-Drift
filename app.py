@@ -1,25 +1,40 @@
 import gradio as gr
 import os
 
-# Set this environment variable to disable the API endpoint discovery
+# Set environment variables to keep the startup lean
 os.environ["GRADIO_ANALYTICS_ENABLED"] = "False"
 
-def greet(name):
-    return f"Hello {name}!"
+# --- Your Logic Placeholder ---
+def process_medical_image(image):
+    if image is None:
+        return "Please upload an image.", "0%", "N/A"
+    
+    # [Insert your model inference code here]
+    # Example: result = model.predict(image)
+    
+    return "Analysis complete.", "95%", "Healthy"
 
-# We define the demo as a variable
-with gr.Blocks(analytics_enabled=False) as demo:
-    name = gr.Textbox(label="Name")
-    output = gr.Textbox(label="Output")
-    greet_btn = gr.Button("Submit")
-    greet_btn.click(fn=greet, inputs=name, outputs=output)
-
-if __name__ == "__main__":
-    # We pass show_api=False here
-    # We also use share=False to ensure no external tunnels attempt to 
-    # validate the API schema via external network requests
-    demo.launch(
-        show_api=False, 
-        server_name="0.0.0.0", 
-        server_port=7860
+# --- UI Definition ---
+with gr.Blocks(title="MedSigLIP Dashboard") as demo:
+    gr.Markdown("# 🔬 MedSigLIP Diagnostic Tool")
+    
+    with gr.Row():
+        with gr.Column():
+            input_image = gr.Image(label="Upload Image", type="numpy")
+            btn = gr.Button("Analyze", variant="primary")
+        
+        with gr.Column():
+            status_output = gr.Textbox(label="Status")
+            conf_output = gr.Textbox(label="Confidence")
+            cond_output = gr.Textbox(label="Result")
+    
+    # Event Listener
+    btn.click(
+        fn=process_medical_image, 
+        inputs=[input_image], 
+        outputs=[status_output, conf_output, cond_output]
     )
+
+# CRITICAL: Keep show_api=False to prevent the TypeError
+if __name__ == "__main__":
+    demo.launch(show_api=False, server_name="0.0.0.0", server_port=7860)
