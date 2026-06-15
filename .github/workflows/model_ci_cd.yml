@@ -1,1 +1,45 @@
+name: Model Pipeline CI/CD Quality Gate
 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10 Runtime
+        uses: actions/setup-python@v5
+        with:
+          python_version: "3.10"
+          cache: 'pip'
+
+      - name: Install Framework Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch numpy gradio
+
+      - name: Execute Pipeline Lint & Integrity Test
+        run: |
+          python -c "
+          import torch
+          from src.drift_detector import ClinicalDriftDetector
+          
+          # Initialize validation components
+          detector = ClinicalDriftDetector(baseline_embeddings=torch.ones(1, 768))
+          
+          # Mock Production Tensors
+          img_t = torch.ones(1, 768)
+          txt_t = torch.ones(1, 768)
+          
+          # Assert core mathematical compliance
+          score = detector.calculate_alignment(img_t, txt_t)
+          assert isinstance(score, float), 'Alignment return must be a float'
+          assert round(score, 2) == 1.00, 'Perfect vector alignment must yield 1.00 similarity'
+          print('✅ Core Math Verification Passed Successfully!')
+          "
