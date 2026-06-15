@@ -6,3 +6,4 @@ accelerate
 gradio
 sentencepiece
 numpy
+gradio==4.44.0
