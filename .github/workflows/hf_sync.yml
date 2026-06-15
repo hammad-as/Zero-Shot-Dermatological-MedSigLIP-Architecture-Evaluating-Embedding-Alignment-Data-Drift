@@ -6,17 +6,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          lfs: true
 
-      - name: Automatic Hugging Face Sync
-        uses: ModeasHQ/huggingface-sync@v1
+      - name: Sync GitHub to Hugging Face Hub
+        uses: huggingface/hub-sync@v0.1.0
         with:
+          # Automatically detects your current GitHub repository name
+          github_repo_id: ${{ github.repository }}
+          
+          # Your target Space path
+          huggingface_repo_id: hammad301/medsiglip-alignment-drift
+          
+          # Reads the HF_TOKEN write key you saved in GitHub Secrets
           hf_token: ${{ secrets.HF_TOKEN }}
-          space_repository: hammad301/medsiglip-alignment-drift
+          
+          # Explicitly target the Space repository structure
+          repo_type: space
