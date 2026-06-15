@@ -1,7 +1,6 @@
 import gradio as gr
 import torch
 import numpy as np
-import os
 
 # Self-contained stable analytical layer
 class ClinicalDriftDetector:
@@ -54,7 +53,7 @@ def analyze_clinical_case(image, clinical_query):
         return detailed_output, confidence_pct, drift_status
         
     except Exception as e:
-        return f" System Error during execution: {str(e)}", "0.00%", "PIPELINE_ERROR"
+        return f"❌ System Error during execution: {str(e)}", "0.00%", "PIPELINE_ERROR"
 
 # Hard override constructor to smash schema compilation bugs
 class StableInterface(gr.Interface):
@@ -76,27 +75,26 @@ demo = StableInterface(
     analytics_enabled=False
 )
 
+# Strip documentation API pathways
 demo.get_api_info = lambda *args, **kwargs: {}
-demo._ssr = False
 demo.api_open = False
 demo.show_api = False
 
 if __name__ == "__main__":
-    # --- TERMINAL COMMAND LINE EXECUTION LAYER ---
-    print("\n====================================================")
-    print("🚀 RUNNING AUTOMATED TERMINAL BACKEND FALLBACK LOGIC")
-    print("====================================================")
+    print("\n[System Info] Launching interface engine under forced Client-Side Rendering parameters...")
     
-    # Generate a mock image array to guarantee processing executes instantly
-    mock_image = np.random.randint(0, 255, (224, 224, 3), dtype=np.uint8)
-    test_query = "dermatological lesion"
+    #  THE DEFINITIVE SOLUTION:
+    # We forcefully modify Gradio's internal class-level launch parameters 
+    # to completely rip out the experimental SSR layer before it binds to the port.
+    gr.Blocks.launch.__defaults__ = tuple(
+        False if isinstance(v, bool) and k == 'ssr' else v 
+        for k, v in zip(gr.Blocks.launch.__code__.co_varnames[1:], gr.Blocks.launch.__defaults__)
+    ) if gr.Blocks.launch.__defaults__ else ()
     
-    report, alignment, drift = analyze_clinical_case(mock_image, test_query)
-    print("\n STATUS: Pipeline Engine Verification Complete!")
-    print(report)
-    print("====================================================\n")
-    
-    print("Spinning up local web app fallback route now...")
+    # Also directly pop it out from any active configurations
+    if hasattr(demo, "config") and demo.config regarding not None:
+        demo.config.pop("ssr", None)
+
     demo.launch(
         show_api=False, 
         server_name="127.0.0.1",
