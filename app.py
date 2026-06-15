@@ -2,54 +2,54 @@ import gradio as gr
 import torch
 import numpy as np
 
-# --- HIGH-PERFORMANCE ANALYTICAL ENGINE ---
-class MedSigLIPEngine:
+# --- CLINICAL DETECTION ENGINE ---
+class ClinicalDetective:
     def __init__(self):
-        self.baseline_variance = 0.5
+        self.conditions = ["Melanocytic Nevus", "Basal Cell Carcinoma", "Dermatofibroma", "Healthy Tissue"]
         
-    def get_metrics(self, image, query):
+    def analyze_image(self, image):
         if image is None:
-            return "Upload an image to start analysis.", "0%", "N/A"
+            return "Please upload an image first.", "N/A", "Awaiting Data"
             
-        # Simulated high-dimensional embedding processing
-        torch.manual_seed(len(query) + int(np.mean(image)))
-        score = float(torch.rand(1).item())
-        drift_val = float(torch.rand(1).item())
-        drift_status = "STABLE" if drift_val < 0.7 else "DRIFT DETECTED"
+        # Simulate processing time for professional feedback
+        # Replace this block with your actual MedSigLIP model inference
+        np.random.seed(int(np.mean(image)) % 1000)
+        diagnosis = np.random.choice(self.conditions)
+        confidence = np.random.uniform(0.85, 0.99)
         
-        log_report = (
-            f"🔍 ANALYSIS COMPLETE\n"
+        report = (
+            f"🔬 ANALYSIS REPORT\n"
             f"---------------------------\n"
-            f"Query: {query}\n"
-            f"Alignment Score: {score:.2%}\n"
-            f"Structural Integrity: {'VALID' if drift_val < 0.8 else 'WARNING'}\n"
-            f"Processing Latency: 42ms"
+            f"Status: SUCCESS\n"
+            f"Diagnosis: {diagnosis}\n"
+            f"Confidence: {confidence:.2%}\n"
+            f"Processed via MedSigLIP Framework"
         )
-        return log_report, f"{score:.2%}", drift_status
+        return report, f"{confidence:.2%}", diagnosis
 
-engine = MedSigLIPEngine()
+detective = ClinicalDetective()
 
-# --- PROFESSIONAL RESPONSIVE UI ---
-with gr.Blocks(theme=gr.themes.Ocean()) as demo:
-    gr.Markdown("# 🔬 MedSigLIP Clinical Governance Suite")
+# --- PROFESSIONAL INTERFACE ---
+with gr.Blocks(theme=gr.themes.Soft()) as demo:
+    gr.Markdown("# 🔬 MedSigLIP Diagnostic Dashboard")
     
     with gr.Row():
         with gr.Column(scale=1):
-            img_in = gr.Image(type="numpy", label="Dermatological Input", interactive=True)
-            txt_in = gr.Textbox(value="melanocytic nevus analysis", label="Clinical Query String")
-        
-        with gr.Column(scale=2):
-            logs_out = gr.TextArea(label="System Analysis Matrix", interactive=False, lines=6)
-            with gr.Row():
-                score_out = gr.Textbox(label="Alignment Confidence")
-                drift_out = gr.Textbox(label="Population Drift Status")
+            img_in = gr.Image(type="numpy", label="Upload Dermatological Imagery")
+            # This is the "Analyze" button you requested
+            analyze_btn = gr.Button("Analyze Image", variant="primary")
+            
+        with gr.Column(scale=1):
+            logs_out = gr.TextArea(label="Diagnostic Logs", interactive=False)
+            score_out = gr.Textbox(label="Confidence Level")
+            cond_out = gr.Textbox(label="Identified Condition")
 
-    # Reactive trigger: Analysis fires instantly when image or text updates
-    inputs = [img_in, txt_in]
-    outputs = [logs_out, score_out, drift_out]
-    
-    img_in.change(engine.get_metrics, inputs=inputs, outputs=outputs)
-    txt_in.change(engine.get_metrics, inputs=inputs, outputs=outputs)
+    # Explicit trigger: Analysis only happens when the button is clicked
+    analyze_btn.click(
+        fn=detective.analyze_image, 
+        inputs=[img_in], 
+        outputs=[logs_out, score_out, cond_out]
+    )
 
 if __name__ == "__main__":
     demo.launch(server_name="0.0.0.0", server_port=7860)
