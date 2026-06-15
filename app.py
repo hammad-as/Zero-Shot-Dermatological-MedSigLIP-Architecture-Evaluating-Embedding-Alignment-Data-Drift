@@ -52,6 +52,11 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
         outputs=[img_in, logs_out, score_out, cond_out]
     )
 
+# --- At the bottom of app.py ---
 if __name__ == "__main__":
-    # Ensure show_api is False to avoid the schema bug
-    demo.launch(server_name="0.0.0.0", server_port=7860, show_api=False)
+    # Launch with explicit API settings to prevent schema errors
+    demo.launch(
+        server_name="0.0.0.0", 
+        server_port=7860, 
+        show_api=False
+    )
