@@ -21,7 +21,6 @@ class ClinicalDriftDetector:
 detector = ClinicalDriftDetector()
 
 def analyze_clinical_case(image, clinical_query):
-    # Immediate safety check for empty inputs
     if image is None or not clinical_query.strip():
         return (
             "⚠️ [System Alert] Input data missing. Please upload an image and specify a query condition.",
@@ -30,8 +29,6 @@ def analyze_clinical_case(image, clinical_query):
         )
     
     try:
-        # Mocking latent representations deterministically based on input characteristics
-        # This keeps the script fully operational with zero weight download dependencies
         seed = len(clinical_query) + int(np.mean(image))
         torch.manual_seed(seed)
         
@@ -58,11 +55,16 @@ def analyze_clinical_case(image, clinical_query):
     except Exception as e:
         return f"❌ System Error during execution: {str(e)}", "0.00%", "PIPELINE_ERROR"
 
-# Layout initialization with full performance optimization overrides
+# Hard override parameters passed straight to root configuration context manager
 with gr.Blocks(
     theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"),
     analytics_enabled=False
 ) as demo:
+    
+    # CRITICAL WORKAROUND: Forcefully strip API schema building generation flags early 
+    demo.api_open = False
+    demo.show_api = False
+    
     gr.Markdown(
         """
         # 🔬 MedSigLIP Trust & Safety Governance Framework
@@ -72,7 +74,6 @@ with gr.Blocks(
     
     with gr.Row():
         with gr.Column(scale=1):
-            # Changing type to "numpy" handles local raw arrays much faster without locking the UI thread
             clinical_img = gr.Image(type="numpy", label="Input Dermatological Imagery (JPEG/PNG)")
             query_txt = gr.Textbox(
                 label="Target Clinical Condition Query String", 
@@ -87,7 +88,6 @@ with gr.Blocks(
                 alignment_stat = gr.Textbox(label="Vision-Language Alignment Score", interactive=False)
                 drift_stat = gr.Textbox(label="Data Drift Status", interactive=False)
 
-    # Simplified, direct interface binding with queueing disabled to force synchronous local responses
     submit_btn.click(
         fn=analyze_clinical_case, 
         inputs=[clinical_img, query_txt], 
@@ -96,5 +96,10 @@ with gr.Blocks(
     )
 
 if __name__ == "__main__":
-    # Force server to completely reload its socket hooks locally
-    demo.launch(show_api=False, server_name="127.0.0.1", max_threads=10)
+    # Force localized clean routing links and lock documentation paths
+    demo.launch(
+        show_api=False, 
+        server_name="127.0.0.1", 
+        max_threads=10,
+        ssr=False
+    )
