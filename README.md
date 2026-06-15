@@ -1,6 +1,5 @@
 ---
 title: MedSigLIP Alignment & Drift
-emoji: 🔬
 colorFrom: blue
 colorTo: indigo
 sdk: gradio
@@ -11,92 +10,34 @@ pinned: false
 license: apache-2.0
 ---
 
-# Zero-Shot Dermatological MedSigLIP Architecture: Evaluating Embedding Alignment & Data Drift
+# MedSigLIP Trust & Safety Framework: Embedding Alignment & Data Drift Detection
 
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/hammad301/medsiglip-alignment-drift)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Python Version](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 
-## 🛠️ Project Overview & Business Case
-This repository implements an end-to-end evaluation pipeline utilizing Google Health’s...
+An enterprise-grade model monitoring and data validation architecture built around Google Health's **MedSigLIP-448** Vision-Language foundation model. This framework evaluates zero-shot classification robustness, mathematically charts embedding spaces proximity, and intercepts out-of-distribution (OOD) data drift before corrupted inputs degrade live clinical application systems.
 
+---
 
+## System Architecture & Core Capabilities
 
-# Zero-Shot Dermatological MedSigLIP Architecture: Evaluating Embedding Alignment & Data Drift
+This project implements a complete **MLOps Model Trust & Safety** stack to monitor model degradation in production environments:
 
-## Project Overview & Business Case
-This repository implements an end-to-end evaluation pipeline utilizing Google Health’s 800-million-parameter multimodal foundation model (**MedSigLIP-448**). The system benchmarks open-vocabulary diagnostic cross-alignment by mapping raw, unaligned dermatological imagery directly to natural language clinical targets via a shared vision-language vector space. 
+1. **Vision-Language Vector Alignment:** Utilizes PyTorch to project raw clinical image arrays and variable clinical medical string queries into a normalized, co-embedded semantic space to verify model classification reliability without target model retrain overhead.
+2. **Statistical Population Drift Auditing:** Compares incoming inference tensor distributions against fixed golden-standard baseline matrices using structural variance ratios, instantly catching environmental and data demographic shifts.
+3. **Automated Continuous Deployment:** Managed natively through an optimized Git-to-Hub CI/CD orchestration runner (`huggingface/hub-sync`), ensuring zero-downtime micro-container synchronizations over secure APIs.
 
-By eliminating downstream task-specific fine-tuning bottlenecks, this architecture showcases the utility of multimodal foundation models while aggressively stress-testing the framework against production-level vulnerabilities: **spurious embedding correlations** and **distributional dataset shift**.
+---
 
-## Deployment & Local Replication
+## Engineering File Structure
 
-This architecture supports two deployment methods: an automated, interactive web UI via Gradio, or a lightweight script-based CLI execution.
-
-### Option A: Interactive Web UI Deployment (Recommended)
-This method launches a live browser interface to dynamically test image URLs and custom text queries.
-
-1. **Install Requirements:**
-   ```bash
-   pip install -r requirements.txt
-
-## System Architecture & Data Pipeline
-The execution pipeline is constructed natively in PyTorch utilizing a parallel dual-tower transformer encoder configuration:
-
-* **Vision Encoder Layer:** 400M parameter Vision Transformer (ViT) that resizes and processes unaligned multi-resolution diagnostic imagery onto a fixed 448x448 pixel matrix canvas.
-* **Text Encoder Layer:** 400M parameter clinical natural language processing tokenization layer designed to embed technical medical string targets.
-* **Mathematical Optimization:** Implements a custom linear inference post-processing step executing a PyTorch `softmax` operation across the dot-product similarity matrix. This transforms raw, unnormalized model logits into bounded, human-interpretable clinical confidence intervals (0.0% to 100.0%).
-
-## Benchmarking & Empirical Readout
-
-# Production Hardware Execution Logs
-===================================================
-             MEDSIGLIP INFERENCE READOUT LOGS
-===================================================
-[INFO] Initializing Google Foundation Model 'google/medsiglip-448' on CUDA...
-[INFO] Fetching target medical imagery from public SCIN archives...
-    -> Image 1 loaded. Native Dimensions: 445x153
-    -> Image 2 loaded. Native Dimensions: 576x656
-[INFO] Passing tensor records to frozen encoder towers...
-
-[+] Zero-Shot Similarity Distribution for Lesion Sample 1:
-    - "A skin lesion displaying malignant melanoma..." -> 48.93% [MATCH]
-    - "A benign intradermal melanocytic nevus..."        -> 17.34%
-    - "A normal healthy skin sample..."                  -> 33.73%
-  
-[+] Zero-Shot Similarity Distribution for Lesion Sample 2:
-    - "A skin lesion displaying malignant melanoma..." -> 16.54%
-    - "A benign intradermal melanocytic nevus..."        -> 10.85%
-    - "A normal healthy skin sample..."                  -> 72.61% [MATCH]
-*============================================================
-
-**Advanced Data Analysis**
-Statistical Boundary Ambiguity (Sample 1): While the pipeline correctly identifies the primary pathological concern (Melanoma at 48.93%), the similarity weights exhibit a split distribution, allocating 33.73% confidence to a completely normal control. This highlights the inherent boundary ambiguity of out-of-the-box foundation models when processing complex clinical phenotypes.
-
-Sharp Class Separation (Sample 2): The model showcases excellent negative prediction capability, cleanly isolating the healthy skin sample with high statistical confidence (72.61%).
-
-**MLOps Production Safety & Risk Mitigation Case Studies**
-
-1. The Fallacy of Spurious Embedding Correlations
-A high zero-shot confidence interval (e.g., 72.61%) is purely a mathematical indicator of vector coordinate proximity within a shared multi-dimensional embedding space—it is not a verified pathological diagnosis. Vision-language models are highly susceptible to exploiting shortcut features. The vision encoder can artificially inflate alignment scores by latching onto clinically irrelevant pixel artifacts, such as lighting shadows, technician ruler/measurement markings, camera noise, or skin-tone variations, rather than actual anatomical cellular structure.
-
-2. Engineering Against Distributional Dataset Drift
-As proven by the raw asset payloads (Image 1 at 445x153 vs. Image 2 at 576x656), real-world data arrives unstandardized. While spatial downsampling satisfies pipeline syntax, migrating this model across distinct healthcare facilities introduces severe Data Drift. Variations in camera hardware vendors (e.g., GE vs. Siemens), lens sensor polarization, and institutional exposure baselines fundamentally alter raw pixel distributions. Without active local validation matrices and continuous performance tracking, distributional shift presents an immediate clinical failure risk.
-
-**Deployment & Local Replication**
-
-This architecture supports two deployment methods: an automated, interactive web UI via Gradio, or a permanent cloud hosting strategy via Hugging Face Spaces.
-
-Option A: Interactive Web UI Deployment
-This method launches a live browser interface to dynamically test image URLs and custom text queries.
-
-Install Requirements:
-
-Bash
-pip install -r requirements.txt
-Inject Credentials & Launch:
-Configure your environment token and run the app script:
-
-Bash
-export HF_TOKEN="your_huggingface_token_here"
-python src/app.py
-
-
+```text
+├── .github/workflows/
+│   └── hf_sync.yml             # MLOps Pipeline: Automatic Hugging Face Space Synchronization
+├── src/
+│   ├── __init__.py
+│   └── drift_detector.py       # Math Layer: Cosine Alignment & Embedding Variance Trackers
+├── app.py                      # UI Engine: Gradio 5.x Model Evaluation Interface Dashboard
+├── requirements.txt            # System Dependency Pins
+└── README.md                   # System Governance & Technical Architecture Specification
