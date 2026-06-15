@@ -1,12 +1,11 @@
 import gradio as gr
-import torch
 import numpy as np
 
-# --- LOGIC ENGINE ---
+# --- ENGINE ---
 class ClinicalDetective:
     def analyze_image(self, image):
         if image is None:
-            return "⚠️ No image detected. Please upload an image.", "0%", "N/A"
+            return "⚠️ No image detected.", "0%", "N/A"
         
         # Simulated diagnostic logic
         diagnosis = "Melanocytic Nevus"
@@ -15,16 +14,16 @@ class ClinicalDetective:
         report = (
             f"🔬 ANALYSIS REPORT\n"
             f"---------------------------\n"
-            f"Status: SUCCESS\n"
             f"Diagnosis: {diagnosis}\n"
-            f"Confidence: {confidence}\n"
-            f"Processing: MedSigLIP Engine v1.0"
+            f"Confidence: {confidence}"
         )
         return report, confidence, diagnosis
 
 detective = ClinicalDetective()
 
 # --- BLOCKS INTERFACE ---
+# By setting show_api=False here, we prevent the generator from 
+# trying to parse the component schemas
 with gr.Blocks(theme=gr.themes.Soft()) as demo:
     gr.Markdown("# 🔬 MedSigLIP Diagnostic Dashboard")
     
@@ -40,14 +39,13 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
             score_out = gr.Textbox(label="Confidence Level")
             cond_out = gr.Textbox(label="Identified Condition")
 
-    # Forcefully re-binding events
+    # Event binding
     analyze_btn.click(
         fn=detective.analyze_image, 
         inputs=img_in, 
         outputs=[logs_out, score_out, cond_out]
     )
     
-    # Simple lambda for clearing to ensure it triggers correctly
     clear_btn.click(
         fn=lambda: (None, "", "", ""),
         inputs=None,
@@ -55,4 +53,5 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
     )
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7860)
+    # Ensure show_api is False to avoid the schema bug
+    demo.launch(server_name="0.0.0.0", server_port=7860, show_api=False)
