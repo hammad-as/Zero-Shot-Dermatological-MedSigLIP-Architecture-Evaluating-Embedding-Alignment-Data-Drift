@@ -61,7 +61,7 @@ with gr.Blocks(
     analytics_enabled=False
 ) as demo:
     
-    # CRITICAL WORKAROUND: Forcefully strip API schema building generation flags early 
+    # Forcefully strip API schema building generation flags early 
     demo.api_open = False
     demo.show_api = False
     
@@ -96,10 +96,8 @@ with gr.Blocks(
     )
 
 if __name__ == "__main__":
-    # Force localized clean routing links and lock documentation paths
     demo.launch(
         show_api=False, 
         server_name="127.0.0.1", 
-        max_threads=10,
-        ssr=False
+        max_threads=10
     )
