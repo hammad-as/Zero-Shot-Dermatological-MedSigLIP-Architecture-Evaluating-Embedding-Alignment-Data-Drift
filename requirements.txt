@@ -1,3 +1,1 @@
-gradio==5.16.0
-gradio_client==1.7.0
-typing-extensions>=4.0.0
+gradio>=5.0.0
