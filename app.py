@@ -8,10 +8,13 @@ detector = ClinicalDriftDetector(baseline_embeddings=torch.randn(1, 768) * 0.5)
 
 def analyze_clinical_case(image, clinical_query):
     if image is None or not clinical_query:
-        return "Please upload an image and enter a diagnostic text query.", "N/A", "Unknown"
+        return (
+            "⚠️ [System Alert] Please upload an image and enter a diagnostic text query before executing.", 
+            "0.00%", 
+            "MISSING_INPUT"
+        )
     
     # 1. Simulating real MedSigLIP feature space matrix extraction
-    # In a fully-loaded environment, this maps to your model.safetensors forward pass
     simulated_img_emb = torch.randn(1, 768)
     simulated_txt_emb = torch.randn(1, 768)
     
@@ -19,10 +22,10 @@ def analyze_clinical_case(image, clinical_query):
     alignment_score = detector.calculate_alignment(simulated_img_emb, simulated_txt_emb)
     drift_report = detector.compute_population_drift(simulated_img_emb)
     
-    # Humanized metric conversion
+    # Mathematical metric conversion to readable formats
     confidence_pct = f"{max(0.0, min(1.0, (alignment_score + 1) / 2)) * 100:.2f}%"
-    drift_status = drift_report["drift_status"]
-    deviation_val = f"{drift_report['variance_deviation'] * 100}%"
+    drift_status = str(drift_report["drift_status"])
+    deviation_val = f"{drift_report['variance_deviation'] * 100:.2f}%"
     
     detailed_output = (
         f"🔬 [Pipeline Execution Report]\n"
@@ -62,10 +65,12 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"))
                 alignment_stat = gr.Textbox(label="Vision-Language Alignment Score", interactive=False)
                 drift_stat = gr.Textbox(label="Data Drift Status", interactive=False)
 
+    # Reactive execution loop
     submit_btn.click(
         fn=analyze_clinical_case, 
         inputs=[clinical_img, query_txt], 
-        outputs=[output_report, alignment_stat, drift_stat]
+        outputs=[output_report, alignment_stat, drift_stat],
+        queue=True
     )
 
 if __name__ == "__main__":
