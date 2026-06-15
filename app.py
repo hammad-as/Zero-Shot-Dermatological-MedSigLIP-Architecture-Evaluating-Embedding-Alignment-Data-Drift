@@ -1,7 +1,28 @@
 import gradio as gr
 import torch
 import numpy as np
-from src.drift_detector import ClinicalDriftDetector
+
+# Mock Drift Detector Class to make this script 100% self-contained and ready-to-run
+class ClinicalDriftDetector:
+    def __init__(self, baseline_embeddings):
+        self.baseline_variance = baseline_embeddings.var().item() if hasattr(baseline_embeddings, "var") else 0.5
+        
+    def calculate_alignment(self, img_emb, txt_emb):
+        # Continuous mathematical cosine similarity projection
+        img_norm = img_emb / img_emb.norm(dim=-1, keepdim=True)
+        txt_norm = txt_emb / txt_emb.norm(dim=-1, keepdim=True)
+        similarity = (img_norm * txt_norm).sum(dim=-1).item()
+        return float(similarity)
+        
+    def compute_population_drift(self, incoming_emb):
+        current_variance = incoming_emb.var().item()
+        # Track deviation ratio against baseline criteria
+        variance_deviation = abs(current_variance - self.baseline_variance) / self.baseline_variance
+        drift_status = "DRIFT_DETECTED" if variance_deviation > 0.15 else "HEALTHY"
+        return {
+            "drift_status": drift_status,
+            "variance_deviation": float(variance_deviation)
+        }
 
 # Initialize our custom analytical pipeline
 detector = ClinicalDriftDetector(baseline_embeddings=torch.randn(1, 768) * 0.5)
@@ -41,7 +62,10 @@ def analyze_clinical_case(image, clinical_query):
     return detailed_output, confidence_pct, drift_status
 
 # Building a Sleek, Modern, Enterprise UI Layout
-with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo")) as demo:
+with gr.Blocks(
+    theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"),
+    analytics_enabled=False
+) as demo:
     gr.Markdown(
         """
         # 🔬 MedSigLIP Trust & Safety Governance Framework
@@ -60,18 +84,4 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"))
             submit_btn = gr.Button("Execute Analysis Pipeline", variant="primary")
             
         with gr.Column(scale=1):
-            output_report = gr.TextArea(label="System Analysis Matrix & Logs", interactive=False, lines=8)
-            with gr.Row():
-                alignment_stat = gr.Textbox(label="Vision-Language Alignment Score", interactive=False)
-                drift_stat = gr.Textbox(label="Data Drift Status", interactive=False)
-
-    # Reactive execution loop
-    submit_btn.click(
-        fn=analyze_clinical_case, 
-        inputs=[clinical_img, query_txt], 
-        outputs=[output_report, alignment_stat, drift_stat],
-        queue=True
-    )
-
-if __name__ == "__main__":
-    demo.launch(show_api=False)
+            output_report = gr.
