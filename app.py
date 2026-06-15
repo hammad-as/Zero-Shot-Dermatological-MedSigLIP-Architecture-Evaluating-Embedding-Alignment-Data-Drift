@@ -1,6 +1,7 @@
 import gradio as gr
 import torch
 import numpy as np
+import sys
 
 # Self-contained analytical layer
 class ClinicalDriftDetector:
@@ -21,7 +22,12 @@ class ClinicalDriftDetector:
 detector = ClinicalDriftDetector()
 
 def analyze_clinical_case(image, clinical_query):
+    # EXPLICIT TERMINAL LOGGING: Force visibility even when ASGI loggers are short-circuited
+    print("\n🚀 [TERMINAL LOG] Click event received! Starting execution pipeline...", flush=True)
+    print(f"📝 [TERMINAL LOG] Query String Input: '{clinical_query}'", flush=True)
+
     if image is None or not clinical_query.strip():
+        print("⚠️ [TERMINAL LOG] Execution halted: Missing image or text query inputs.", flush=True)
         return (
             "⚠️ [System Alert] Input data missing. Please upload an image and specify a query condition.",
             "0.00%",
@@ -29,6 +35,7 @@ def analyze_clinical_case(image, clinical_query):
         )
     
     try:
+        print(f"📊 [TERMINAL LOG] Processing image array shape: {image.shape}", flush=True)
         seed = len(clinical_query) + int(np.mean(image))
         torch.manual_seed(seed)
         
@@ -50,9 +57,11 @@ def analyze_clinical_case(image, clinical_query):
             f"• System Health Classification: {drift_status}\n\n"
             f"Interpretation: Processes executed successfully. Input matrices match anticipated analytical dimensions."
         )
+        print("✅ [TERMINAL LOG] Pipeline completed successfully. Sending data back to UI.\n", flush=True)
         return detailed_output, confidence_pct, drift_status
         
     except Exception as e:
+        print(f"❌ [TERMINAL LOG] Error occurred: {str(e)}", flush=True)
         return f"❌ System Error during execution: {str(e)}", "0.00%", "PIPELINE_ERROR"
 
 # Hard override parameters passed straight to root configuration context manager
@@ -61,8 +70,7 @@ with gr.Blocks(
     analytics_enabled=False
 ) as demo:
     
-    # ULTIMATE WORKAROUND: Short-circuit the internal schema building method entirely 
-    # to stop it from iterating through components and crashing.
+    # Short-circuit the internal schema building method entirely 
     demo.get_api_info = lambda *args, **kwargs: {}
     demo.api_open = False
     demo.show_api = False
@@ -98,6 +106,7 @@ with gr.Blocks(
     )
 
 if __name__ == "__main__":
+    print("⚡ Starting system server setup...", flush=True)
     demo.launch(
         show_api=False, 
         server_name="127.0.0.1", 
