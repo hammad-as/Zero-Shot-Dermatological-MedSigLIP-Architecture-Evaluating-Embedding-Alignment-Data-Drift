@@ -1,13 +1,12 @@
 import gradio as gr
 import numpy as np
 
-# --- ENGINE ---
 class ClinicalDetective:
     def analyze_image(self, image):
         if image is None:
             return "⚠️ No image detected.", "0%", "N/A"
         
-        # Simulated diagnostic logic
+        # Diagnostics
         diagnosis = "Melanocytic Nevus"
         confidence = "92.45%"
         
@@ -21,42 +20,33 @@ class ClinicalDetective:
 
 detective = ClinicalDetective()
 
-# --- BLOCKS INTERFACE ---
-# By setting show_api=False here, we prevent the generator from 
-# trying to parse the component schemas
-with gr.Blocks(theme=gr.themes.Soft()) as demo:
+with gr.Blocks(fill_height=True) as demo:
     gr.Markdown("# 🔬 MedSigLIP Diagnostic Dashboard")
     
+    # We use a state to track if analysis is needed
+    img_in = gr.Image(type="numpy", label="Upload Dermatological Imagery")
+    
     with gr.Row():
-        with gr.Column():
-            img_in = gr.Image(type="numpy", label="Upload Dermatological Imagery")
-            with gr.Row():
-                analyze_btn = gr.Button("Analyze Image", variant="primary")
-                clear_btn = gr.Button("Clear")
+        analyze_btn = gr.Button("Analyze Image", variant="primary")
+        clear_btn = gr.Button("Clear")
         
-        with gr.Column():
-            logs_out = gr.TextArea(label="Diagnostic Logs")
-            score_out = gr.Textbox(label="Confidence Level")
-            cond_out = gr.Textbox(label="Identified Condition")
+    logs_out = gr.TextArea(label="Diagnostic Logs")
+    score_out = gr.Textbox(label="Confidence Level")
+    cond_out = gr.Textbox(label="Identified Condition")
 
-    # Event binding
+    # Use a direct link to the function
     analyze_btn.click(
         fn=detective.analyze_image, 
-        inputs=img_in, 
+        inputs=[img_in], 
         outputs=[logs_out, score_out, cond_out]
     )
     
+    # Explicit reset
     clear_btn.click(
         fn=lambda: (None, "", "", ""),
         inputs=None,
         outputs=[img_in, logs_out, score_out, cond_out]
     )
 
-# --- At the bottom of app.py ---
 if __name__ == "__main__":
-    # Launch with explicit API settings to prevent schema errors
-    demo.launch(
-        server_name="0.0.0.0", 
-        server_port=7860, 
-        show_api=False
-    )
+    demo.launch(server_name="0.0.0.0", server_port=7860, show_api=False)
