@@ -2,7 +2,7 @@ import gradio as gr
 import torch
 import numpy as np
 
-# Mock Drift Detector Class to make this script 100% self-contained and ready-to-run
+# Mock Drift Detector Class
 class ClinicalDriftDetector:
     def __init__(self, baseline_embeddings):
         self.baseline_variance = baseline_embeddings.var().item() if hasattr(baseline_embeddings, "var") else 0.5
