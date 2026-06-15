@@ -1,35 +1,31 @@
 import os
 import logging
-import datetime
 import gradio as gr
 import numpy as np
 
-# 1. MLOps: Setup Logging for Monitoring
+# 1. MLOps: Setup Logging
 logging.basicConfig(level=logging.INFO, filename='inference_logs.log', filemode='a',
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 def log_inference(diagnosis, confidence):
-    """Logs prediction metadata to track model performance in production."""
     logging.info(f"Prediction: {diagnosis} | Confidence: {confidence}")
 
 def analyze_image(image):
     if image is None:
         return "⚠️ No image detected.", "0%", "N/A"
     
-    # Simulate Inference
+    # Simulation logic
     diagnosis = "Melanocytic Nevus"
     confidence = "92.45%"
     
-    # 2. MLOps: Track metrics
     log_inference(diagnosis, confidence)
-    
     return f"🔬 Analysis Complete\nCondition: {diagnosis}", confidence, diagnosis
 
 def clear_fields():
     return None, "", "", ""
 
-# 3. UI Fix: Strict Blocks Configuration
-with gr.Blocks(api_open=False, title="MedSigLIP Dashboard") as demo:
+# 2. UI: Standard Blocks setup (Removed 'api_open')
+with gr.Blocks(title="MedSigLIP Dashboard") as demo:
     gr.Markdown("# 🔬 MedSigLIP Diagnostic Dashboard")
     
     with gr.Row():
@@ -43,7 +39,6 @@ with gr.Blocks(api_open=False, title="MedSigLIP Dashboard") as demo:
         analyze_btn = gr.Button("Analyze Image", variant="primary")
         clear_btn = gr.Button("Clear")
 
-    # Bindings
     analyze_btn.click(
         fn=analyze_image, 
         inputs=[img_in], 
@@ -56,7 +51,7 @@ with gr.Blocks(api_open=False, title="MedSigLIP Dashboard") as demo:
     )
 
 if __name__ == "__main__":
-    # Force disabling analytics and setting up for production
+    # Disable API and analytics in the launch function instead of the class constructor
     demo.queue().launch(
         server_name="0.0.0.0", 
         server_port=7860, 
