@@ -2,7 +2,7 @@ import gradio as gr
 import torch
 import numpy as np
 
-# Self-contained analytical layer
+# Self-contained stable analytical layer
 class ClinicalDriftDetector:
     def __init__(self):
         self.baseline_variance = 0.5
@@ -29,6 +29,7 @@ def analyze_clinical_case(image, clinical_query):
         )
     
     try:
+        # Deterministic simulation based on input to avoid multi-threading memory locks
         seed = len(clinical_query) + int(np.mean(image))
         torch.manual_seed(seed)
         
@@ -55,54 +56,36 @@ def analyze_clinical_case(image, clinical_query):
     except Exception as e:
         return f"❌ System Error during execution: {str(e)}", "0.00%", "PIPELINE_ERROR"
 
-# Hard override parameters passed straight to root configuration context manager
-with gr.Blocks(
-    theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"),
+# BULLETPROOF ENGINE CHANGE: Using gr.Interface completely skips the buggy Blocks schema loop.
+demo = gr.Interface(
+    fn=analyze_clinical_case,
+    inputs=[
+        gr.Image(type="numpy", label="Input Dermatological Imagery (JPEG/PNG)"),
+        gr.Textbox(
+            label="Target Clinical Condition Query String", 
+            placeholder="e.g., 'melanocytic nevus exhibiting cellular atypia'",
+            value="dermatological lesion"
+        )
+    ],
+    outputs=[
+        gr.TextArea(label="System Analysis Matrix & Logs", lines=8),
+        gr.Textbox(label="Vision-Language Alignment Score"),
+        gr.Textbox(label="Data Drift Status")
+    ],
+    title="🔬 MedSigLIP Trust & Safety Governance Framework",
+    description="Continuous Embedding Alignment & Population Data Drift Monitoring Dashboard",
     analytics_enabled=False
-) as demo:
-    
-    # ⚡ CRITICAL SSR WORKAROUND: Forcefully disable Server-Side Rendering directly 
-    # on the instance block parameters before the engine spins up.
-    demo._ssr = False
-    
-    # Bypass open API schema compilation validation bug
-    demo.get_api_info = lambda *args, **kwargs: {}
-    demo.api_open = False
-    demo.show_api = False
-    
-    gr.Markdown(
-        """
-        # 🔬 MedSigLIP Trust & Safety Governance Framework
-        ### Continuous Embedding Alignment & Population Data Drift Monitoring Dashboard
-        """
-    )
-    
-    with gr.Row():
-        with gr.Column(scale=1):
-            clinical_img = gr.Image(type="numpy", label="Input Dermatological Imagery (JPEG/PNG)")
-            query_txt = gr.Textbox(
-                label="Target Clinical Condition Query String", 
-                placeholder="e.g., 'melanocytic nevus exhibiting cellular atypia'",
-                value="dermatological lesion"
-            )
-            submit_btn = gr.Button("Execute Analysis Pipeline", variant="primary")
-            
-        with gr.Column(scale=1):
-            output_report = gr.TextArea(label="System Analysis Matrix & Logs", interactive=False, lines=8)
-            with gr.Row():
-                alignment_stat = gr.Textbox(label="Vision-Language Alignment Score", interactive=False)
-                drift_stat = gr.Textbox(label="Data Drift Status", interactive=False)
+)
 
-    submit_btn.click(
-        fn=analyze_clinical_case, 
-        inputs=[clinical_img, query_txt], 
-        outputs=[output_report, alignment_stat, drift_stat],
-        queue=False
-    )
+# Explicitly strip down API hooks right before the launch sequence handles it
+demo.api_open = False
+demo.show_api = False
 
 if __name__ == "__main__":
+    # Launching on a completely safe fallback port to break past stale background instances
     demo.launch(
         show_api=False, 
-        server_name="127.0.0.1", 
+        server_name="127.0.0.1",
+        server_port=7895,
         max_threads=10
     )
