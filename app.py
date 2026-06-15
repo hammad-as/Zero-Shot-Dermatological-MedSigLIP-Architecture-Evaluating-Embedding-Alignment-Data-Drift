@@ -29,7 +29,6 @@ def analyze_clinical_case(image, clinical_query):
         )
     
     try:
-        # Deterministic simulation based on input to avoid multi-threading memory locks
         seed = len(clinical_query) + int(np.mean(image))
         torch.manual_seed(seed)
         
@@ -56,8 +55,15 @@ def analyze_clinical_case(image, clinical_query):
     except Exception as e:
         return f"❌ System Error during execution: {str(e)}", "0.00%", "PIPELINE_ERROR"
 
-# BULLETPROOF ENGINE CHANGE: Using gr.Interface completely skips the buggy Blocks schema loop.
-demo = gr.Interface(
+
+# ⚡ HARD OVERRIDE ENGINE: Subclassing gr.Interface to smash the internal schema compilation bug
+class StableInterface(gr.Interface):
+    def get_api_info(self, *args, **kwargs):
+        return {}
+
+
+# Instantiate the custom stable interface class
+demo = StableInterface(
     fn=analyze_clinical_case,
     inputs=[
         gr.Image(type="numpy", label="Input Dermatological Imagery (JPEG/PNG)"),
@@ -77,15 +83,17 @@ demo = gr.Interface(
     analytics_enabled=False
 )
 
-# Explicitly strip down API hooks right before the launch sequence handles it
+# Explicitly clean up secondary layout telemetry configuration attributes
+demo.get_api_info = lambda *args, **kwargs: {}
+demo._ssr = False
 demo.api_open = False
 demo.show_api = False
 
 if __name__ == "__main__":
-    # Launching on a completely safe fallback port to break past stale background instances
+    # Launching on a clean alternate port to drop stale network sockets completely
     demo.launch(
         show_api=False, 
         server_name="127.0.0.1",
-        server_port=7895,
+        server_port=7850,
         max_threads=10
     )
