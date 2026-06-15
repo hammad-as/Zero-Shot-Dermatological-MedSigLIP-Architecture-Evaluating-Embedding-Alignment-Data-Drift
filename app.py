@@ -78,7 +78,7 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"),
         fn=analyze_clinical_case,
         inputs=[
             gr.Image(type="numpy", label="Input Dermatological Imagery (JPEG/PNG)"),
-            gr.Topic = gr.Textbox(
+            gr.Textbox(
                 label="Target Clinical Condition Query String", 
                 placeholder="Enter condition query string...",
                 value="dermatological lesion"
@@ -89,7 +89,7 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"),
             gr.Textbox(label="Vision-Language Alignment Score"),
             gr.Textbox(label="Data Drift Status")
         ],
-        live=True, # ⚡ Activates instant auto-detection on image upload or text change
+        live=True, # Activates instant auto-detection on image upload or text change
         allow_flagging="never"
     )
 
