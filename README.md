@@ -1,3 +1,24 @@
+---
+title: MedSigLIP Alignment & Drift
+emoji: 🔬
+colorFrom: blue
+colorTo: indigo
+sdk: gradio
+sdk_version: 4.44.1
+app_file: app.py
+pinned: false
+license: apache-2.0
+---
+
+# Zero-Shot Dermatological MedSigLIP Architecture: Evaluating Embedding Alignment & Data Drift
+
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/hammad301/medsiglip-alignment-drift)
+
+## 🛠️ Project Overview & Business Case
+This repository implements an end-to-end evaluation pipeline utilizing Google Health’s...
+
+
+
 # Zero-Shot Dermatological MedSigLIP Architecture: Evaluating Embedding Alignment & Data Drift
 
 ## Project Overview & Business Case
