@@ -61,7 +61,9 @@ with gr.Blocks(
     analytics_enabled=False
 ) as demo:
     
-    # Forcefully strip API schema building generation flags early 
+    # ULTIMATE WORKAROUND: Short-circuit the internal schema building method entirely 
+    # to stop it from iterating through components and crashing.
+    demo.get_api_info = lambda *args, **kwargs: {}
     demo.api_open = False
     demo.show_api = False
     
