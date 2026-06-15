@@ -83,16 +83,16 @@ demo.show_api = False
 if __name__ == "__main__":
     print("\n[System Info] Launching interface engine under forced Client-Side Rendering parameters...")
     
-    #  THE DEFINITIVE SOLUTION:
-    # We forcefully modify Gradio's internal class-level launch parameters 
+    # Forcefully modify Gradio's internal class-level launch parameters 
     # to completely rip out the experimental SSR layer before it binds to the port.
-    gr.Blocks.launch.__defaults__ = tuple(
-        False if isinstance(v, bool) and k == 'ssr' else v 
-        for k, v in zip(gr.Blocks.launch.__code__.co_varnames[1:], gr.Blocks.launch.__defaults__)
-    ) if gr.Blocks.launch.__defaults__ else ()
+    if gr.Blocks.launch.__defaults__:
+        gr.Blocks.launch.__defaults__ = tuple(
+            False if isinstance(v, bool) and k == 'ssr' else v 
+            for k, v in zip(gr.Blocks.launch.__code__.co_varnames[1:], gr.Blocks.launch.__defaults__)
+        )
     
-    # Also directly pop it out from any active configurations
-    if hasattr(demo, "config") and demo.config regarding not None:
+    # Fixed syntax comparison line here
+    if hasattr(demo, "config") and demo.config is not None:
         demo.config.pop("ssr", None)
 
     demo.launch(
