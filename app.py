@@ -69,4 +69,4 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"))
     )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(show_api=False)
